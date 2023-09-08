@@ -1,6 +1,6 @@
 {
   "name": "namecheap-dns-updater",
-  "version": "3.0.2",
+  "version": "0.0.1",
   "description": "Update the IP of a Dynamic DNS domain on Namecheap",
   "type": "module",
   "main": "./src/api.js",
