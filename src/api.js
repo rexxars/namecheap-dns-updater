@@ -16,11 +16,11 @@ export async function update(options) {
     password: options.password,
   })
 
-  const url = new URL(`https://dynamicdns.park-your-domain.com/update?${qs.toString()}`)
-
   if (options.ip) {
-    url.searchParams.set('ip', options.ip)
+    qs.searchParams.set('ip', options.ip)
   }
+
+  const url = new URL(`https://dynamicdns.park-your-domain.com/update?${qs.toString()}`)
 
   const response = await fetch(url)
   if (response.status !== 200) {
