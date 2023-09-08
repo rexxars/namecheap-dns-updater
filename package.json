@@ -1,0 +1,35 @@
+{
+  "name": "namecheap-dns-updater",
+  "version": "3.0.2",
+  "description": "Update the IP of a Dynamic DNS domain on Namecheap",
+  "type": "module",
+  "main": "./src/api.js",
+  "bin": {
+    "namecheap-dns-updater": "./src/nc-updater.js"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "eslint ."
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "Espen Hovlandsdal <espen@hovlandsdal.com>",
+  "license": "MIT",
+  "dependencies": {
+    "fast-xml-parser": "^4.2.7",
+    "meow": "^12.1.1",
+    "undici": "^5.23.0",
+    "update-notifier": "^6.0.2"
+  },
+  "devDependencies": {
+    "@sanity/semantic-release-preset": "^4.0.2",
+    "eslint": "^8.48.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-sanity": "^6.0.0",
+    "prettier": "^3.0.3",
+    "semantic-release": "^21.1.1"
+  }
+}

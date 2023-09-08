@@ -1,0 +1,77 @@
+name: CI
+
+# Workflow name based on selected inputs. Fallback to default Github naming when expression evaluates to empty string
+run-name: >-
+  ${{
+    inputs.release && 'CI ➤ Publish to NPM' ||
+    ''
+  }}
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publish new release'
+        required: true
+        default: false
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  release:
+    needs: [test]
+    # only run if opt-in during workflow_dispatch
+    if: always() && github.event.inputs.release == 'true'
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # Need to fetch entire commit history to
+          # analyze every commit since last release
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          cache: npm
+      - run: npm ci
+      - name: Semantic release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v4.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          push: true
+          tags: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{ steps.semantic.outputs.new_release_major_version }},${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{ steps.semantic.outputs.new_release_version }},${{env.REGISTRY}}/${{env.IMAGE_NAME}}:latest
