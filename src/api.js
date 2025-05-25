@@ -17,7 +17,7 @@ export async function update(options) {
   })
 
   if (options.ip) {
-    qs.searchParams.set('ip', options.ip)
+    qs.set('ip', options.ip)
   }
 
   const url = new URL(`https://dynamicdns.park-your-domain.com/update?${qs.toString()}`)
