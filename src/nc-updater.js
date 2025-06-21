@@ -86,6 +86,7 @@ const cli = meow(
 const options = {
   domain: trimEnv(process.env.NC_DDNS_DOMAIN),
   password: trimEnv(process.env.NC_DDNS_PASSWORD),
+  apiHost: trimEnv(process.env.NC_DDNS_API_HOST),
   ...cli.flags,
 }
 

@@ -12,6 +12,7 @@ export async function update(options, context = {}) {
   })
 
   const hosts = Array.isArray(options.host) ? options.host : [options.host || '@']
+  const apiHost = options.apiHost || 'https://dynamicdns.park-your-domain.com'
 
   let resolvedIp = options.ip
   for (const host of hosts) {
@@ -29,7 +30,7 @@ export async function update(options, context = {}) {
       qs.set('ip', options.ip)
     }
 
-    const url = new URL(`https://dynamicdns.park-your-domain.com/update?${qs.toString()}`)
+    const url = new URL(`${apiHost}/update?${qs.toString()}`)
 
     log(`Updating DNS record for host "${host}"`)
     const response = await fetch(url)

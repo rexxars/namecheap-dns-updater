@@ -1,8 +1,11 @@
 export interface UpdaterOptions {
   domain: string
   password: string
+
   host?: string | Array<string>
   ip?: string
+
+  apiHost?: string
 }
 
 export interface UpdaterContext {
