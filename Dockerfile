@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:22-alpine
 LABEL version="1.0" maintainer="Espen Hovlandsdal <espen@sanity.io>"
 
 WORKDIR /srv/app

@@ -1,5 +1,4 @@
 import {XMLParser} from 'fast-xml-parser'
-import {fetch} from 'undici'
 
 const required = ['domain', 'password']
 

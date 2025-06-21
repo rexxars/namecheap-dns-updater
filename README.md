@@ -51,7 +51,7 @@ $ namecheap-dns-updater --help
 
 ## Node usage
 
-Requires Node 18 or above.
+Requires Node 20 or above.
 
 ```js
 import {update} from 'namecheap-dns-updater'
