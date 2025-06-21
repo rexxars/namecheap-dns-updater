@@ -4,6 +4,7 @@
   "description": "Update the IP of a Dynamic DNS domain on Namecheap",
   "type": "module",
   "main": "./src/api.js",
+  "types": "./src/api.d.ts",
   "bin": {
     "namecheap-dns-updater": "./src/nc-updater.js"
   },

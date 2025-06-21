@@ -37,6 +37,9 @@ $ namecheap-dns-updater --help
     # Update the 'www' record with your current external IP
     $ namecheap-dns-updater --host www --domain espen.codes --password myDdnsPassword
 
+    # Update both '@' and 'www' records with your current external IP
+    $ namecheap-dns-updater --host @ --host www --domain espen.codes --password myDdnsPassword
+
   Notes
     - The password is NOT your account password, it is a separate per-domain setting.
     - The values for the host and domain must be of the same case (lowercase/uppercase) as in your account.
@@ -58,7 +61,7 @@ import {update} from 'namecheap-dns-updater'
 
 // Note: Leave `ip` undefined to update use your current external IP
 update({
-  host: 'www', // Host to update
+  host: 'www', // Host to update - can also be an array of hosts
   domain: 'mydomain.tld', // Domain name to update
   password: 'yourDdnsPassword', // Namecheap DDNS password
   ip: '193.212.1.10', // IP to update record with

@@ -9,37 +9,48 @@ export async function update(options) {
     }
   })
 
-  const qs = new URLSearchParams({
-    host: options.host || '@',
-    domain: options.domain,
-    password: options.password,
-  })
+  const hosts = Array.isArray(options.host) ? options.host : [options.host || '@']
 
-  if (options.ip) {
-    qs.set('ip', options.ip)
+  let resolvedIp = options.ip
+  for (const host of hosts) {
+    if (typeof host !== 'string') {
+      throw new Error(`Host must be a string, got ${typeof host}`)
+    }
+
+    const qs = new URLSearchParams({
+      host,
+      domain: options.domain,
+      password: options.password,
+    })
+
+    if (options.ip) {
+      qs.set('ip', options.ip)
+    }
+
+    const url = new URL(`https://dynamicdns.park-your-domain.com/update?${qs.toString()}`)
+
+    const response = await fetch(url)
+    if (response.status !== 200) {
+      throw new Error(`Request failed with status ${response.status} ${response.statusText}`.trim())
+    }
+
+    const parser = new XMLParser()
+    const res = parser.parse(await response.text())
+
+    if (!res['interface-response']) {
+      throw new Error('Invalid response, missing `interface-response` property')
+    }
+
+    if (res['interface-response'].ErrCount > 0) {
+      const messages = Object.values(res['interface-response'].errors).filter(
+        (err) => typeof err === 'string',
+      )
+
+      throw new Error(`Failed to update record:\n${messages.join('\n')}`)
+    }
+
+    resolvedIp = res['interface-response'].IP
   }
 
-  const url = new URL(`https://dynamicdns.park-your-domain.com/update?${qs.toString()}`)
-
-  const response = await fetch(url)
-  if (response.status !== 200) {
-    throw new Error(`Request failed with status ${response.status} ${response.statusText}`.trim())
-  }
-
-  const parser = new XMLParser()
-  const res = parser.parse(await response.text())
-
-  if (!res['interface-response']) {
-    throw new Error('Invalid response, missing `interface-response` property')
-  }
-
-  if (res['interface-response'].ErrCount > 0) {
-    const messages = Object.values(res['interface-response'].errors).filter(
-      (err) => typeof err === 'string',
-    )
-
-    throw new Error(`Failed to update record:\n${messages.join('\n')}`)
-  }
-
-  return res['interface-response'].IP
+  return resolvedIp
 }

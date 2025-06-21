@@ -1,12 +1,14 @@
 #!/usr/bin/env node
-
+/* eslint-disable no-console */
+/* eslint-disable no-process-env */
+/* eslint-disable no-process-exit */
 import fs from 'node:fs'
 import path from 'node:path'
 import updateNotifier from 'update-notifier'
 import meow from 'meow'
 import {update} from './api.js'
 
-const pkgPath = path.join(new URL('..', import.meta.url).pathname, 'package.json')
+const pkgPath = path.join(import.meta.dirname, '..', 'package.json')
 
 // eslint-disable-next-line no-sync
 const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'))
@@ -33,6 +35,9 @@ const cli = meow(
     # Update the 'www' record with your current external IP
     $ namecheap-dns-updater --host www --domain espen.codes --password myDdnsPassword
 
+    # Update both '@' and 'www' records with your current external IP
+    $ namecheap-dns-updater --host @ --host www --domain espen.codes --password myDdnsPassword
+
   Notes
     - The password is NOT your account password, it is a separate per-domain setting.
     - The values for the host and domain must be of the same case (lowercase/uppercase) as in your account.
@@ -52,6 +57,7 @@ const cli = meow(
       },
       host: {
         type: 'string',
+        isMultiple: true,
       },
       domain: {
         type: 'string',
@@ -63,14 +69,15 @@ const cli = meow(
   },
 )
 
-/* eslint-disable no-process-env */
 const options = {
-  host: trimEnv(process.env.NC_DDNS_HOST),
   domain: trimEnv(process.env.NC_DDNS_DOMAIN),
   password: trimEnv(process.env.NC_DDNS_PASSWORD),
   ...cli.flags,
 }
-/* eslint-enable no-process-env */
+
+if (Array.isArray(options.host) && options.host.length === 0) {
+  options.host = [trimEnv(process.env.NC_DDNS_HOST) || '@']
+}
 
 if (cli.flags.help) {
   cli.showHelp()
