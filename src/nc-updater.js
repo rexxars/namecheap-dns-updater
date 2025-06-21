@@ -56,6 +56,7 @@ const cli = meow(
     --host = NC_DDNS_HOST (supports multiple hosts separated by commas)
     --domain = NC_DDNS_DOMAIN
     --password = NC_DDNS_PASSWORD
+    --interval = NC_DDNS_INTERVAL
 `,
   {
     importMeta: import.meta,
@@ -90,6 +91,7 @@ const options = {
   domain: trimEnv(process.env.NC_DDNS_DOMAIN),
   password: trimEnv(process.env.NC_DDNS_PASSWORD),
   apiHost: trimEnv(process.env.NC_DDNS_API_HOST),
+  interval: process.env.NC_DDNS_INTERVAL ? Number(process.env.NC_DDNS_INTERVAL) : undefined,
   ...cli.flags,
 }
 

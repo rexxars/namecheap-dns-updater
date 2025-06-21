@@ -320,6 +320,55 @@ describe('CLI Module', () => {
       expect(requests[0].query.host).toBe('@')
       expect(requests[1].query.host).toBe('www')
     })
+
+    it('should use NC_DDNS_INTERVAL environment variable', async () => {
+      const testIp = '203.0.113.15'
+      mockServer.mockResponse(
+        {host: '@', domain: 'example.com', password: 'testpass'},
+        {body: createSuccessResponse(testIp)},
+      )
+
+      const result = await runCli(['--domain', 'example.com', '--password', 'testpass'], {
+        NC_DDNS_INTERVAL: '0', // 0 means no interval, just run once
+        NC_DDNS_API_HOST: apiHost,
+      })
+
+      expect(result.code).toBe(0)
+
+      const requests = mockServer.getRequests()
+      expect(requests).toHaveLength(1)
+      expect(requests[0].query).toMatchObject({
+        host: '@',
+        domain: 'example.com',
+        password: 'testpass',
+      })
+    })
+
+    it('should prefer --interval flag over NC_DDNS_INTERVAL environment variable', async () => {
+      const testIp = '203.0.113.16'
+      mockServer.mockResponse(
+        {host: '@', domain: 'example.com', password: 'testpass'},
+        {body: createSuccessResponse(testIp)},
+      )
+
+      const result = await runCli(
+        ['--domain', 'example.com', '--password', 'testpass', '--interval', '0'],
+        {
+          NC_DDNS_INTERVAL: '300', // Should be overridden by CLI flag
+          NC_DDNS_API_HOST: apiHost,
+        },
+      )
+
+      expect(result.code).toBe(0)
+
+      const requests = mockServer.getRequests()
+      expect(requests).toHaveLength(1)
+      expect(requests[0].query).toMatchObject({
+        host: '@',
+        domain: 'example.com',
+        password: 'testpass',
+      })
+    })
   })
 
   describe('verbose mode', () => {

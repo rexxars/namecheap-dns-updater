@@ -29,6 +29,8 @@ $ namecheap-dns-updater --help
     --host <host> Host the record belongs to, eg '@', 'www' etc. Defaults to '@'.
     --domain <domain-name> Domain to update, eg 'yourdomain.tld'
     --password <password> Dynamic DNS password
+    --interval <seconds> Updates records every X seconds. Returns immediately if not set.
+    --verbose, -v  Enables verbose output
 
   Examples
     # Update the '@' record with a specific IP address
@@ -40,6 +42,12 @@ $ namecheap-dns-updater --help
     # Update both '@' and 'www' records with your current external IP
     $ namecheap-dns-updater --host @ --host www --domain espen.codes --password myDdnsPassword
 
+    # Update the '@' record every 15 minutes with your current external IP
+    $ namecheap-dns-updater --interval 900 --domain espen.codes --password myDdnsPassword
+
+    # Update multiple hosts using environment variable
+    $ NC_DDNS_HOST=@,www,api namecheap-dns-updater --domain espen.codes --password myDdnsPassword
+
   Notes
     - The password is NOT your account password, it is a separate per-domain setting.
     - The values for the host and domain must be of the same case (lowercase/uppercase) as in your account.
@@ -50,6 +58,7 @@ $ namecheap-dns-updater --help
     --host = NC_DDNS_HOST (supports multiple hosts separated by commas)
     --domain = NC_DDNS_DOMAIN
     --password = NC_DDNS_PASSWORD
+    --interval = NC_DDNS_INTERVAL
 ```
 
 ## Node usage
