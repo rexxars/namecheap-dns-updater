@@ -2,7 +2,9 @@ import {XMLParser} from 'fast-xml-parser'
 
 const required = ['domain', 'password']
 
-export async function update(options) {
+export async function update(options, context = {}) {
+  const log = context.log || (() => {})
+
   required.forEach((opt) => {
     if (!options[opt]) {
       throw new Error(`Option "${opt}" must be specified`)
@@ -29,6 +31,7 @@ export async function update(options) {
 
     const url = new URL(`https://dynamicdns.park-your-domain.com/update?${qs.toString()}`)
 
+    log(`Updating DNS record for host "${host}"`)
     const response = await fetch(url)
     if (response.status !== 200) {
       throw new Error(`Request failed with status ${response.status} ${response.statusText}`.trim())
@@ -50,6 +53,7 @@ export async function update(options) {
     }
 
     resolvedIp = res['interface-response'].IP
+    log(`DNS record for host "${host}" updated to IP: ${resolvedIp}`)
   }
 
   return resolvedIp

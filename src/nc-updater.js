@@ -27,6 +27,8 @@ const cli = meow(
     --host <host> Host the record belongs to, eg '@', 'www' etc. Defaults to '@'.
     --domain <domain-name> Domain to update, eg 'yourdomain.tld'
     --password <password> Dynamic DNS password
+    --interval <seconds> Updates records every X seconds. Returns immediately if not set.
+    --verbose, -v  Enables verbose output
 
   Examples
     # Update the '@' record with a specific IP address
@@ -37,6 +39,9 @@ const cli = meow(
 
     # Update both '@' and 'www' records with your current external IP
     $ namecheap-dns-updater --host @ --host www --domain espen.codes --password myDdnsPassword
+
+    # Update the '@' record every 15 minutes with your current external IP
+    $ namecheap-dns-updater --interval 900 --domain espen.codes --password myDdnsPassword
 
   Notes
     - The password is NOT your account password, it is a separate per-domain setting.
@@ -65,6 +70,15 @@ const cli = meow(
       password: {
         type: 'string',
       },
+      interval: {
+        type: 'number',
+        default: 0,
+      },
+      verbose: {
+        type: 'boolean',
+        shortFlag: 'v',
+        default: false,
+      },
     },
   },
 )
@@ -83,4 +97,26 @@ if (cli.flags.help) {
   cli.showHelp()
 }
 
-update(options)
+// eslint-disable-next-line no-empty-function
+const log = options.verbose ? console.log.bind(console) : () => {}
+
+if (options.interval < 0) {
+  throw new Error('Interval must be a positive number or zero.')
+}
+
+if (isNaN(options.interval) || !Number.isFinite(options.interval)) {
+  throw new Error('Interval must be a (finite) number.')
+}
+
+if (options.interval) {
+  log(`Updating every ${options.interval} seconds...`)
+  setInterval(() => update(options, {log}).catch(exitOnError), options.interval * 1000)
+} else {
+  log('Updating immediately...')
+  update(options, {log}).catch(exitOnError)
+}
+
+function exitOnError(err) {
+  console.error(err)
+  process.exit(1)
+}
