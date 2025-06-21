@@ -43,6 +43,9 @@ const cli = meow(
     # Update the '@' record every 15 minutes with your current external IP
     $ namecheap-dns-updater --interval 900 --domain espen.codes --password myDdnsPassword
 
+    # Update multiple hosts using environment variable
+    $ NC_DDNS_HOST=@,www,api namecheap-dns-updater --domain espen.codes --password myDdnsPassword
+
   Notes
     - The password is NOT your account password, it is a separate per-domain setting.
     - The values for the host and domain must be of the same case (lowercase/uppercase) as in your account.
@@ -50,7 +53,7 @@ const cli = meow(
     - To update the wildcard subdomain, use '*' as the host
 
   Environment variables (fallbacks for missing flags)
-    --host = NC_DDNS_HOST
+    --host = NC_DDNS_HOST (supports multiple hosts separated by commas)
     --domain = NC_DDNS_DOMAIN
     --password = NC_DDNS_PASSWORD
 `,
@@ -91,7 +94,11 @@ const options = {
 }
 
 if (Array.isArray(options.host) && options.host.length === 0) {
-  options.host = [trimEnv(process.env.NC_DDNS_HOST) || '@']
+  const envHost = trimEnv(process.env.NC_DDNS_HOST) || '@'
+  options.host = envHost
+    .split(',')
+    .map((host) => host.trim())
+    .filter((host) => host.length > 0)
 }
 
 if (cli.flags.help) {

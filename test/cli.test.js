@@ -243,6 +243,83 @@ describe('CLI Module', () => {
         password: 'clipass',
       })
     })
+
+    it('should support multiple hosts in NC_DDNS_HOST environment variable', async () => {
+      const testIp = '203.0.113.12'
+      mockServer.mockResponse(
+        {host: '@', domain: 'example.com', password: 'testpass'},
+        {body: createSuccessResponse(testIp)},
+      )
+      mockServer.mockResponse(
+        {host: 'www', domain: 'example.com', password: 'testpass'},
+        {body: createSuccessResponse(testIp)},
+      )
+      mockServer.mockResponse(
+        {host: 'api', domain: 'example.com', password: 'testpass'},
+        {body: createSuccessResponse(testIp)},
+      )
+
+      const result = await runCli(['--domain', 'example.com', '--password', 'testpass'], {
+        NC_DDNS_HOST: '@,www,api',
+        NC_DDNS_API_HOST: apiHost,
+      })
+
+      expect(result.code).toBe(0)
+
+      const requests = mockServer.getRequests()
+      expect(requests).toHaveLength(3)
+      expect(requests[0].query.host).toBe('@')
+      expect(requests[1].query.host).toBe('www')
+      expect(requests[2].query.host).toBe('api')
+    })
+
+    it('should handle spaces in comma-separated hosts', async () => {
+      const testIp = '203.0.113.13'
+      mockServer.mockResponse(
+        {host: '@', domain: 'example.com', password: 'testpass'},
+        {body: createSuccessResponse(testIp)},
+      )
+      mockServer.mockResponse(
+        {host: 'www', domain: 'example.com', password: 'testpass'},
+        {body: createSuccessResponse(testIp)},
+      )
+
+      const result = await runCli(['--domain', 'example.com', '--password', 'testpass'], {
+        NC_DDNS_HOST: ' @ , www ',
+        NC_DDNS_API_HOST: apiHost,
+      })
+
+      expect(result.code).toBe(0)
+
+      const requests = mockServer.getRequests()
+      expect(requests).toHaveLength(2)
+      expect(requests[0].query.host).toBe('@')
+      expect(requests[1].query.host).toBe('www')
+    })
+
+    it('should handle empty values in comma-separated hosts', async () => {
+      const testIp = '203.0.113.14'
+      mockServer.mockResponse(
+        {host: '@', domain: 'example.com', password: 'testpass'},
+        {body: createSuccessResponse(testIp)},
+      )
+      mockServer.mockResponse(
+        {host: 'www', domain: 'example.com', password: 'testpass'},
+        {body: createSuccessResponse(testIp)},
+      )
+
+      const result = await runCli(['--domain', 'example.com', '--password', 'testpass'], {
+        NC_DDNS_HOST: '@,,www,',
+        NC_DDNS_API_HOST: apiHost,
+      })
+
+      expect(result.code).toBe(0)
+
+      const requests = mockServer.getRequests()
+      expect(requests).toHaveLength(2)
+      expect(requests[0].query.host).toBe('@')
+      expect(requests[1].query.host).toBe('www')
+    })
   })
 
   describe('verbose mode', () => {

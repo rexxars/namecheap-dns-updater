@@ -393,4 +393,45 @@ describe('CLI Unit Tests', () => {
     expect(requests).toHaveLength(1)
     expect(requests[0].query.host).toBe('custom')
   })
+
+  it('should handle multiple hosts in NC_DDNS_HOST environment variable', async () => {
+    const testIp = '203.0.113.10'
+    mockServer.mockResponse(
+      {host: '@', domain: 'example.com', password: 'testpass'},
+      {body: createSuccessResponse(testIp)},
+    )
+    mockServer.mockResponse(
+      {host: 'www', domain: 'example.com', password: 'testpass'},
+      {body: createSuccessResponse(testIp)},
+    )
+    mockServer.mockResponse(
+      {host: 'api', domain: 'example.com', password: 'testpass'},
+      {body: createSuccessResponse(testIp)},
+    )
+
+    process.argv = [
+      'node',
+      '/path/to/nc-updater.js',
+      '--domain',
+      'example.com',
+      '--password',
+      'testpass',
+    ]
+
+    process.env.NC_DDNS_HOST = '@,www,api'
+    process.env.NC_DDNS_API_HOST = apiHost
+
+    // Import the CLI module
+    await import('../src/nc-updater.js')
+
+    // Wait a bit for async operations
+    await new Promise((resolve) => setTimeout(resolve, 100))
+
+    // Verify all hosts were updated
+    const requests = mockServer.getRequests()
+    expect(requests).toHaveLength(3)
+    expect(requests[0].query.host).toBe('@')
+    expect(requests[1].query.host).toBe('www')
+    expect(requests[2].query.host).toBe('api')
+  })
 })

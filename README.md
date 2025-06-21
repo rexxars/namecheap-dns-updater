@@ -47,7 +47,7 @@ $ namecheap-dns-updater --help
     - To update the wildcard subdomain, use '*' as the host
 
   Environment variables (fallbacks for missing flags)
-    --host = NC_DDNS_HOST
+    --host = NC_DDNS_HOST (supports multiple hosts separated by commas)
     --domain = NC_DDNS_DOMAIN
     --password = NC_DDNS_PASSWORD
 ```
@@ -77,6 +77,13 @@ The `ghcr.io/rexxars/namecheap-dns-updater:latest` [Docker image](https://github
 ```bash
 docker run \
   -e NC_DDNS_HOST=@ \
+  -e NC_DDNS_DOMAIN=mydomain.com \
+  -e NC_DDNS_PASSWORD=yourToken \
+  ghcr.io/rexxars/namecheap-dns-updater:latest
+
+# Update multiple hosts using comma-separated values
+docker run \
+  -e NC_DDNS_HOST=@,www,api \
   -e NC_DDNS_DOMAIN=mydomain.com \
   -e NC_DDNS_PASSWORD=yourToken \
   ghcr.io/rexxars/namecheap-dns-updater:latest
