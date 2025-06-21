@@ -5,6 +5,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.0](https://github.com/rexxars/namecheap-dns-updater/compare/v2.0.0...v2.1.0) (2025-06-21)
+
+### Features
+
+- allow defining interval through environment variable ([cca083b](https://github.com/rexxars/namecheap-dns-updater/commit/cca083b5d74bdbe53039d6891bd3f9d99cd00ccb))
+- allow passing multiple hosts in `NC_DDNS_HOST` env var ([cf2693e](https://github.com/rexxars/namecheap-dns-updater/commit/cf2693e57fd0f08c710acc6bccde6fc9e20cfe61))
+
 ## [2.0.0](https://github.com/rexxars/namecheap-dns-updater/compare/v1.0.1...v2.0.0) (2025-06-21)
 
 ### ⚠ BREAKING CHANGES
