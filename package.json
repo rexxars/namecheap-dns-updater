@@ -12,7 +12,10 @@
     "src"
   ],
   "scripts": {
-    "test": "eslint ."
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint ."
   },
   "engines": {
     "node": ">=20.0.0"
@@ -34,10 +37,12 @@
   },
   "devDependencies": {
     "@sanity/semantic-release-preset": "^5.0.0",
+    "@vitest/coverage-v8": "^2.1.8",
     "eslint": "^8.48.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-config-sanity": "^6.0.0",
     "prettier": "^3.5.3",
-    "semantic-release": "^24.2.5"
+    "semantic-release": "^24.2.5",
+    "vitest": "^2.1.8"
   }
 }
